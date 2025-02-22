@@ -1,7 +1,120 @@
-<p>Hello 大家好</p>
-<p>我是dragon，这是我的个人网站。 </p>
-<p>很高兴你来到这里, 你可以在以下的网站找到我</p>
+<!DOCTYPE html>
+<html>
+<head>
+<title>贪吃蛇</title>
+<meta charset="UTF-8">
+<style type="text/css">
+* { margin: 0; }
+.map {
+margin: 100px auto;
+height: 600px;
+width: 900px;
+background: #00D0FF;
+border: 10px solid #AFAEB2;
+border-radius: 8px;
+}
+</style>
+</head>
+<body>
+<div class="map">
+<canvas id="canvas" height="600" width="900"></canvas>
+</div>
 
-<ul>
-  <li> <a href="https://www.bilibili.com/">B站</a> </li>
-</ul>
+<script type="text/javascript">
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var snake = [];
+var snakeCount = 6;
+var foodx = 0;
+var foody = 0;
+var togo = 0;
+
+function drawTable() {
+for (var i = 0; i < 60; i++) {
+ctx.strokeStyle = "black";
+ctx.beginPath();
+ctx.moveTo(15 * i, 0);
+ctx.lineTo(15 * i, 600);
+ctx.closePath();
+ctx.stroke();
+}
+for (var j = 0; j < 40; j++) {
+ctx.strokeStyle = "black";
+ctx.beginPath();
+ctx.moveTo(0, 15 * j);
+ctx.lineTo(900, 15 * j);
+ctx.closePath();
+ctx.stroke();
+}
+for (var k = 0; k < snakeCount; k++) {
+ctx.fillStyle = k == snakeCount - 1 ? "red" : "#000";
+ctx.fillRect(snake[k].x, snake[k].y, 15, 15);
+}
+ctx.fillStyle = "black";
+ctx.fillRect(foodx, foody, 15, 15);
+ctx.fill();
+}
+
+function start() {
+for (var k = 0; k < snakeCount; k++) {
+snake[k] = { x: k * 15, y: 0 };
+}
+drawTable();
+addFood();
+}
+
+function addFood() {
+foodx = Math.floor(Math.random() * 60) * 15;
+foody = Math.floor(Math.random() * 40) * 15;
+for (var k = 0; k < snake.length; k++) {
+if (foodx == snake[k].x && foody == snake[k].y) {
+addFood();
+}
+}
+}
+
+function move() {
+switch (togo) {
+case 1: snake.push({ x: snake[snakeCount - 1].x - 15, y: snake[snakeCount - 1].y }); break;
+case 2: snake.push({ x: snake[snakeCount - 1].x, y: snake[snakeCount - 1].y - 15 }); break;
+case 3: snake.push({ x: snake[snakeCount - 1].x + 15, y: snake[snakeCount - 1].y }); break;
+case 4: snake.push({ x: snake[snakeCount - 1].x, y: snake[snakeCount - 1].y + 15 }); break;
+default: snake.push({ x: snake[snakeCount - 1].x + 15, y: snake[snakeCount - 1].y });
+}
+snake.shift();
+ctx.clearRect(0, 0, 900, 600);
+isEat();
+isDead();
+drawTable();
+}
+
+function keydown(e) {
+switch (e.keyCode) {
+case 37: togo = 1; break;
+case 38: togo = 2; break;
+case 39: togo = 3; break;
+case 40: togo = 4; break;
+}
+}
+
+function isEat() {
+if (snake[snakeCount - 1].x == foodx && snake[snakeCount - 1].y == foody) {
+addFood();
+snakeCount++;
+snake.unshift({ x: -15, y: -15 });
+}
+}
+
+function isDead() {
+if (snake[snakeCount - 1].x > 885 || snake[snakeCount - 1].y > 585 ||
+snake[snakeCount - 1].x < 0 || snake[snakeCount - 1].y < 0) {
+alert("You are dead, GAME OVER!!!");
+window.location.reload();
+}
+}
+
+document.onkeydown = function(e) { keydown(e); }
+window.onload = function() { start(); setInterval(move, 150); drawTable(); }
+</script>
+</body>
+</html>
